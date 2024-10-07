@@ -264,6 +264,7 @@ function GridLayoutMinimumWidthControl( { layout, onChange } ) {
 				</FlexItem>
 				<FlexItem isBlock>
 					<RangeControl
+						__nextHasNoMarginBottom
 						onChange={ handleSliderChange }
 						value={ quantity || 0 }
 						min={ 0 }
@@ -367,6 +368,7 @@ function GridLayoutColumnsAndRowsControl( {
 							/>
 						) : (
 							<RangeControl
+								__nextHasNoMarginBottom
 								value={ columnCount ?? 0 }
 								onChange={ ( value ) =>
 									onChange( {
@@ -447,6 +449,7 @@ function GridLayoutTypeControl( { layout, onChange } ) {
 
 	return (
 		<ToggleGroupControl
+			__next40pxDefaultSize
 			__nextHasNoMarginBottom
 			label={ __( 'Grid item position' ) }
 			value={ gridPlacement }
