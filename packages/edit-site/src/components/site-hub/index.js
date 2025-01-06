@@ -7,7 +7,11 @@ import clsx from 'clsx';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Button, __experimentalHStack as HStack } from '@wordpress/components';
+import {
+	Button,
+	__experimentalHStack as HStack,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { decodeEntities } from '@wordpress/html-entities';
@@ -32,15 +36,11 @@ const SiteHub = memo(
 		const { dashboardLink, homeUrl, siteTitle } = useSelect( ( select ) => {
 			const { getSettings } = unlock( select( editSiteStore ) );
 
-			const {
-				getSite,
-				getUnstableBase, // Site index.
-			} = select( coreStore );
-			const _site = getSite();
+			const { getEntityRecord } = select( coreStore );
+			const _site = getEntityRecord( 'root', 'site' );
 			return {
-				dashboardLink:
-					getSettings().__experimentalDashboardLink || 'index.php',
-				homeUrl: getUnstableBase()?.home,
+				dashboardLink: getSettings().__experimentalDashboardLink,
+				homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
 				siteTitle:
 					! _site?.title && !! _site?.url
 						? filterURLForDisplay( _site?.url )
@@ -61,12 +61,13 @@ const SiteHub = memo(
 						) }
 					>
 						<Button
+							__next40pxDefaultSize
 							ref={ ref }
 							href={ dashboardLink }
 							label={ __( 'Go to the Dashboard' ) }
 							className="edit-site-layout__view-mode-toggle"
 							style={ {
-								transform: 'scale(0.5)',
+								transform: 'scale(0.5333) translateX(-4px)', // Offset to position the icon 12px from viewport edge
 								borderRadius: 4,
 							} }
 						>
@@ -77,12 +78,18 @@ const SiteHub = memo(
 					<HStack>
 						<div className="edit-site-site-hub__title">
 							<Button
+								__next40pxDefaultSize
 								variant="link"
 								href={ homeUrl }
 								target="_blank"
-								label={ __( 'View site (opens in a new tab)' ) }
 							>
 								{ decodeEntities( siteTitle ) }
+								<VisuallyHidden as="span">
+									{
+										/* translators: accessibility text */
+										__( '(opens in a new tab)' )
+									}
+								</VisuallyHidden>
 							</Button>
 						</div>
 						<HStack
@@ -91,6 +98,7 @@ const SiteHub = memo(
 							className="edit-site-site-hub__actions"
 						>
 							<Button
+								size="compact"
 								className="edit-site-site-hub_toggle-command-center"
 								icon={ search }
 								onClick={ () => openCommandCenter() }
@@ -112,20 +120,25 @@ export const SiteHubMobile = memo(
 		const history = useHistory();
 		const { navigate } = useContext( SidebarNavigationContext );
 
-		const { homeUrl, siteTitle } = useSelect( ( select ) => {
-			const {
-				getSite,
-				getUnstableBase, // Site index.
-			} = select( coreStore );
-			const _site = getSite();
-			return {
-				homeUrl: getUnstableBase()?.home,
-				siteTitle:
-					! _site?.title && !! _site?.url
-						? filterURLForDisplay( _site?.url )
-						: _site?.title,
-			};
-		}, [] );
+		const { dashboardLink, isBlockTheme, homeUrl, siteTitle } = useSelect(
+			( select ) => {
+				const { getSettings } = unlock( select( editSiteStore ) );
+
+				const { getEntityRecord, getCurrentTheme } =
+					select( coreStore );
+				const _site = getEntityRecord( 'root', 'site' );
+				return {
+					dashboardLink: getSettings().__experimentalDashboardLink,
+					isBlockTheme: getCurrentTheme()?.is_block_theme,
+					homeUrl: getEntityRecord( 'root', '__unstableBase' )?.home,
+					siteTitle:
+						! _site?.title && !! _site?.url
+							? filterURLForDisplay( _site?.url )
+							: _site?.title,
+				};
+			},
+			[]
+		);
 		const { open: openCommandCenter } = useDispatch( commandsStore );
 
 		return (
@@ -140,17 +153,25 @@ export const SiteHubMobile = memo(
 						) }
 					>
 						<Button
+							__next40pxDefaultSize
 							ref={ ref }
-							label={ __( 'Go to Site Editor' ) }
 							className="edit-site-layout__view-mode-toggle"
 							style={ {
 								transform: 'scale(0.5)',
 								borderRadius: 4,
 							} }
-							onClick={ () => {
-								history.push( {} );
-								navigate( 'back' );
-							} }
+							{ ...( ! isBlockTheme
+								? {
+										href: dashboardLink,
+										label: __( 'Go to the Dashboard' ),
+								  }
+								: {
+										onClick: () => {
+											history.navigate( '/' );
+											navigate( 'back' );
+										},
+										label: __( 'Go to Site Editor' ),
+								  } ) }
 						>
 							<SiteIcon className="edit-site-layout__view-mode-toggle-icon" />
 						</Button>
@@ -159,6 +180,7 @@ export const SiteHubMobile = memo(
 					<HStack>
 						<div className="edit-site-site-hub__title">
 							<Button
+								__next40pxDefaultSize
 								variant="link"
 								href={ homeUrl }
 								target="_blank"
@@ -173,6 +195,7 @@ export const SiteHubMobile = memo(
 							className="edit-site-site-hub__actions"
 						>
 							<Button
+								__next40pxDefaultSize
 								className="edit-site-site-hub_toggle-command-center"
 								icon={ search }
 								onClick={ () => openCommandCenter() }

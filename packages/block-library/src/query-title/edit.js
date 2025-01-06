@@ -15,7 +15,7 @@ import {
 	HeadingLevelDropdown,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -25,7 +25,14 @@ import { useArchiveLabel } from './use-archive-label';
 const SUPPORTED_TYPES = [ 'archive', 'search' ];
 
 export default function QueryTitleEdit( {
-	attributes: { type, level, textAlign, showPrefix, showSearchTerm },
+	attributes: {
+		type,
+		level,
+		levelOptions,
+		textAlign,
+		showPrefix,
+		showSearchTerm,
+	},
 	setAttributes,
 } ) {
 	const { archiveTypeLabel, archiveNameLabel } = useArchiveLabel();
@@ -53,7 +60,7 @@ export default function QueryTitleEdit( {
 				if ( archiveNameLabel ) {
 					title = sprintf(
 						/* translators: 1: Archive type title e.g: "Category", 2: Label of the archive e.g: "Shoes" */
-						__( '%1$s: %2$s' ),
+						_x( '%1$s: %2$s', 'archive label' ),
 						archiveTypeLabel,
 						archiveNameLabel
 					);
@@ -130,6 +137,7 @@ export default function QueryTitleEdit( {
 			<BlockControls group="block">
 				<HeadingLevelDropdown
 					value={ level }
+					options={ levelOptions }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}

@@ -8,23 +8,24 @@ import type { ReactNode } from 'react';
  */
 import { __experimentalHStack as HStack } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
+import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { default as DataViewsBulkActions } from '../dataviews-bulk-actions';
-import DataViewsBulkActionsToolbar from '../dataviews-bulk-actions-toolbar';
 import DataViewsContext from '../dataviews-context';
-import DataViewsFilters from '../dataviews-filters';
+import {
+	default as DataViewsFilters,
+	useFilters,
+	FiltersToggle,
+} from '../dataviews-filters';
 import DataViewsLayout from '../dataviews-layout';
-import DataviewsPagination from '../dataviews-pagination';
+import DataViewsFooter from '../dataviews-footer';
 import DataViewsSearch from '../dataviews-search';
 import DataViewsViewConfig from '../dataviews-view-config';
 import { normalizeFields } from '../../normalize-fields';
 import type { Action, Field, View, SupportedLayouts } from '../../types';
 import type { SelectionOrUpdater } from '../../private-types';
-import DensityPicker from '../../layouts/grid/density-picker';
-import { LAYOUT_GRID } from '../../constants';
 
 type ItemWithId = { id: string };
 
@@ -44,12 +45,17 @@ type DataViewsProps< Item > = {
 	defaultLayouts: SupportedLayouts;
 	selection?: string[];
 	onChangeSelection?: ( items: string[] ) => void;
+	onClickItem?: ( item: Item ) => void;
+	isItemClickable?: ( item: Item ) => boolean;
 	header?: ReactNode;
+	getItemLevel?: ( item: Item ) => number;
 } & ( Item extends ItemWithId
 	? { getItemId?: ( item: Item ) => string }
 	: { getItemId: ( item: Item ) => string } );
 
 const defaultGetItemId = ( item: ItemWithId ) => item.id;
+const defaultIsItemClickable = () => true;
+const EMPTY_ARRAY: any[] = [];
 
 export default function DataViews< Item >( {
 	view,
@@ -57,18 +63,29 @@ export default function DataViews< Item >( {
 	fields,
 	search = true,
 	searchLabel = undefined,
-	actions = [],
+	actions = EMPTY_ARRAY,
 	data,
 	getItemId = defaultGetItemId,
+	getItemLevel,
 	isLoading = false,
 	paginationInfo,
 	defaultLayouts,
 	selection: selectionProperty,
 	onChangeSelection,
+	onClickItem,
+	isItemClickable = defaultIsItemClickable,
 	header,
 }: DataViewsProps< Item > ) {
+	const [ containerWidth, setContainerWidth ] = useState( 0 );
+	const containerRef = useResizeObserver(
+		( resizeObserverEntries: any ) => {
+			setContainerWidth(
+				resizeObserverEntries[ 0 ].borderBoxSize[ 0 ].inlineSize
+			);
+		},
+		{ box: 'border-box' }
+	);
 	const [ selectionState, setSelectionState ] = useState< string[] >( [] );
-	const [ density, setDensity ] = useState< number >( 0 );
 	const isUncontrolled =
 		selectionProperty === undefined || onChangeSelection === undefined;
 	const selection = isUncontrolled ? selectionState : selectionProperty;
@@ -90,6 +107,11 @@ export default function DataViews< Item >( {
 		);
 	}, [ selection, data, getItemId ] );
 
+	const filters = useFilters( _fields, view );
+	const [ isShowingFilter, setIsShowingFilter ] = useState< boolean >( () =>
+		( filters || [] ).some( ( filter ) => filter.isPrimary )
+	);
+
 	return (
 		<DataViewsContext.Provider
 			value={ {
@@ -105,30 +127,34 @@ export default function DataViews< Item >( {
 				openedFilter,
 				setOpenedFilter,
 				getItemId,
-				density,
+				getItemLevel,
+				isItemClickable,
+				onClickItem,
+				containerWidth,
 			} }
 		>
-			<div className="dataviews-wrapper">
+			<div className="dataviews-wrapper" ref={ containerRef }>
 				<HStack
 					alignment="top"
-					justify="start"
+					justify="space-between"
 					className="dataviews__view-actions"
+					spacing={ 1 }
 				>
 					<HStack
 						justify="start"
-						className="dataviews-filters__container"
-						wrap
+						expanded={ false }
+						className="dataviews__search"
 					>
 						{ search && <DataViewsSearch label={ searchLabel } /> }
-						<DataViewsFilters />
-					</HStack>
-					{ view.type === LAYOUT_GRID && (
-						<DensityPicker
-							density={ density }
-							setDensity={ setDensity }
+						<FiltersToggle
+							filters={ filters }
+							view={ view }
+							onChangeView={ onChangeView }
+							setOpenedFilter={ setOpenedFilter }
+							setIsShowingFilter={ setIsShowingFilter }
+							isShowingFilter={ isShowingFilter }
 						/>
-					) }
-					<DataViewsBulkActions />
+					</HStack>
 					<HStack
 						spacing={ 1 }
 						expanded={ false }
@@ -140,9 +166,9 @@ export default function DataViews< Item >( {
 						{ header }
 					</HStack>
 				</HStack>
+				{ isShowingFilter && <DataViewsFilters /> }
 				<DataViewsLayout />
-				<DataviewsPagination />
-				<DataViewsBulkActionsToolbar />
+				<DataViewsFooter />
 			</div>
 		</DataViewsContext.Provider>
 	);

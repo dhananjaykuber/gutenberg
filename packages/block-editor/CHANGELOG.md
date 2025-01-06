@@ -2,6 +2,39 @@
 
 ## Unreleased
 
+## 14.10.0 (2025-01-02)
+
+## 14.9.0 (2024-12-11)
+
+## 14.8.0 (2024-11-27)
+
+## 14.7.0 (2024-11-16)
+
+## 14.6.0 (2024-10-30)
+
+## 14.5.0 (2024-10-16)
+
+## 14.4.0 (2024-10-03)
+
+## 14.3.0 (2024-09-19)
+
+## 14.2.0 (2024-09-05)
+
+## 14.1.0 (2024-08-21)
+
+## 14.0.0 (2024-08-07)
+
+### Breaking Changes
+
+-   `URLInput`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#64282](https://github.com/WordPress/gutenberg/pull/64282)).
+-   `LineHeightControl`: Remove deprecated `__nextHasNoMarginBottom` prop and promote to default behavior ([#64281](https://github.com/WordPress/gutenberg/pull/64281)).
+
+### Enhancements
+
+-   `FontFamilyControl`: Add `__nextHasNoMarginBottom` prop for opting into the new margin-free styles ([#64280](https://github.com/WordPress/gutenberg/pull/64280)).
+
+## 13.4.0 (2024-07-24)
+
 ## 13.3.0 (2024-07-10)
 
 ## 13.2.0 (2024-06-26)
