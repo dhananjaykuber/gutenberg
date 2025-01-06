@@ -100,15 +100,14 @@ test.describe( 'Block template registration', () => {
 		page,
 	} ) => {
 		// Create a post.
-		await admin.visitAdminPage( '/post-new.php' );
-		await page.getByLabel( 'Close', { exact: true } ).click();
+		await admin.createNewPost();
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'User-created post.' },
 		} );
 
 		// Swap template.
-		await page.getByRole( 'button', { name: 'Post' } ).click();
+		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Swap template' } ).click();
 		await page.getByText( 'Plugin Template' ).click();
@@ -128,14 +127,14 @@ test.describe( 'Block template registration', () => {
 		blockTemplateRegistrationUtils,
 	} ) => {
 		// Create a post.
-		await admin.visitAdminPage( '/post-new.php' );
+		await admin.createNewPost();
 		await editor.insertBlock( {
 			name: 'core/paragraph',
 			attributes: { content: 'User-created post.' },
 		} );
 
 		// Swap template.
-		await page.getByRole( 'button', { name: 'Post' } ).click();
+		await page.getByRole( 'button', { name: 'Post', exact: true } ).click();
 		await page.getByRole( 'button', { name: 'Template options' } ).click();
 		await page.getByRole( 'menuitem', { name: 'Swap template' } ).click();
 		await page.getByText( 'Custom', { exact: true } ).click();
@@ -160,6 +159,12 @@ test.describe( 'Block template registration', () => {
 		await expect(
 			page.getByText( 'Custom Template (overridden by the theme)' )
 		).toBeHidden();
+		// Verify the template description fall backs to the plugin registered description.
+		await expect(
+			page.getByText(
+				'A custom template registered by a plugin and overridden by a theme.'
+			)
+		).toBeVisible();
 		// Verify the theme template shows the theme name as the author.
 		await expect( page.getByText( 'AuthorEmptytheme' ) ).toBeVisible();
 	} );
@@ -313,7 +318,9 @@ test.describe( 'Block template registration', () => {
 			.getByLabel( 'Dismiss this notice' )
 			.getByText( `"Author: Admin" reset.` );
 		await page.getByPlaceholder( 'Search' ).fill( 'Author: admin' );
-		await page.getByRole( 'link', { name: 'Author: Admin' } ).click();
+		await page
+			.locator( '.fields-field__title', { hasText: 'Author: Admin' } )
+			.click();
 		const actions = page.getByLabel( 'Actions' );
 		await actions.first().click();
 		await page.getByRole( 'menuitem', { name: 'Reset' } ).click();

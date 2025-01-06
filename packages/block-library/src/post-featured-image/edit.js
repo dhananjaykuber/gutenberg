@@ -10,13 +10,13 @@ import { isBlobURL } from '@wordpress/blob';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	MenuItem,
 	ToggleControl,
-	PanelBody,
 	Placeholder,
 	Button,
 	Spinner,
 	TextControl,
+	__experimentalToolsPanel as ToolsPanel,
+	__experimentalToolsPanelItem as ToolsPanelItem,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -39,6 +39,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import DimensionControls from './dimension-controls';
 import OverlayControls from './overlay-controls';
 import Overlay from './overlay';
+import { useToolsPanelDropdownMenuProps } from '../utils/hooks';
 
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -184,6 +185,8 @@ export default function PostFeaturedImageEdit( {
 		setTemporaryURL();
 	};
 
+	const dropdownMenuProps = useToolsPanelDropdownMenuProps();
+
 	const controls = blockEditingMode === 'default' && (
 		<>
 			<InspectorControls group="color">
@@ -202,23 +205,63 @@ export default function PostFeaturedImageEdit( {
 				/>
 			</InspectorControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
-					<ToggleControl
-						__nextHasNoMarginBottom
+				<ToolsPanel
+					label={ __( 'Settings' ) }
+					resetAll={ () => {
+						setAttributes( {
+							isLink: false,
+							linkTarget: '_self',
+							rel: '',
+						} );
+					} }
+					dropdownMenuProps={ dropdownMenuProps }
+				>
+					<ToolsPanelItem
 						label={
 							postType?.labels.singular_name
 								? sprintf(
-										// translators: %s: Name of the post type e.g: "Page".
+										// translators: %s: Name of the post type e.g: "post".
 										__( 'Link to %s' ),
 										postType.labels.singular_name
 								  )
 								: __( 'Link to post' )
 						}
-						onChange={ () => setAttributes( { isLink: ! isLink } ) }
-						checked={ isLink }
-					/>
+						isShownByDefault
+						hasValue={ () => !! isLink }
+						onDeselect={ () =>
+							setAttributes( {
+								isLink: false,
+							} )
+						}
+					>
+						<ToggleControl
+							__nextHasNoMarginBottom
+							label={
+								postType?.labels.singular_name
+									? sprintf(
+											// translators: %s: Name of the post type e.g: "post".
+											__( 'Link to %s' ),
+											postType.labels.singular_name
+									  )
+									: __( 'Link to post' )
+							}
+							onChange={ () =>
+								setAttributes( { isLink: ! isLink } )
+							}
+							checked={ isLink }
+						/>
+					</ToolsPanelItem>
 					{ isLink && (
-						<>
+						<ToolsPanelItem
+							label={ __( 'Open in new tab' ) }
+							isShownByDefault
+							hasValue={ () => '_self' !== linkTarget }
+							onDeselect={ () =>
+								setAttributes( {
+									linkTarget: '_self',
+								} )
+							}
+						>
 							<ToggleControl
 								__nextHasNoMarginBottom
 								label={ __( 'Open in new tab' ) }
@@ -229,9 +272,21 @@ export default function PostFeaturedImageEdit( {
 								}
 								checked={ linkTarget === '_blank' }
 							/>
+						</ToolsPanelItem>
+					) }
+					{ isLink && (
+						<ToolsPanelItem
+							label={ __( 'Link rel' ) }
+							isShownByDefault
+							hasValue={ () => !! rel }
+							onDeselect={ () =>
+								setAttributes( {
+									rel: '',
+								} )
+							}
+						>
 							<TextControl
-								// TODO: Switch to `true` (40px size) if possible
-								__next40pxDefaultSize={ false }
+								__next40pxDefaultSize
 								__nextHasNoMarginBottom
 								label={ __( 'Link rel' ) }
 								value={ rel }
@@ -239,9 +294,9 @@ export default function PostFeaturedImageEdit( {
 									setAttributes( { rel: newRel } )
 								}
 							/>
-						</>
+						</ToolsPanelItem>
 					) }
-				</PanelBody>
+				</ToolsPanel>
 			</InspectorControls>
 		</>
 	);
@@ -310,6 +365,7 @@ export default function PostFeaturedImageEdit( {
 				mediaLibraryButton={ ( { open } ) => {
 					return (
 						<Button
+							__next40pxDefaultSize
 							icon={ upload }
 							variant="primary"
 							label={ label }
@@ -367,11 +423,8 @@ export default function PostFeaturedImageEdit( {
 						accept="image/*"
 						onSelect={ onSelectImage }
 						onError={ onUploadError }
-					>
-						<MenuItem onClick={ () => setFeaturedImage( 0 ) }>
-							{ __( 'Reset' ) }
-						</MenuItem>
-					</MediaReplaceFlow>
+						onReset={ () => setFeaturedImage( 0 ) }
+					/>
 				</BlockControls>
 			) }
 			<figure { ...blockProps }>

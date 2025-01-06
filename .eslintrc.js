@@ -137,6 +137,11 @@ const restrictedSyntax = [
 		message:
 			'Avoid truthy checks on length property rendering, as zero length is rendered verbatim.',
 	},
+	{
+		selector:
+			'CallExpression[callee.name=/^(__|_x|_n|_nx)$/] > Literal[value=/^toggle\\b/i]',
+		message: "Avoid using the verb 'Toggle' in translatable strings",
+	},
 ];
 
 /** `no-restricted-syntax` rules for components. */
@@ -156,6 +161,7 @@ module.exports = {
 		'plugin:eslint-comments/recommended',
 		'plugin:storybook/recommended',
 	],
+	plugins: [ 'react-compiler' ],
 	globals: {
 		wp: 'off',
 		globalThis: 'readonly',
@@ -177,6 +183,8 @@ module.exports = {
 		'@wordpress/dependency-group': 'error',
 		'@wordpress/wp-global-usage': 'error',
 		'@wordpress/react-no-unsafe-timeout': 'error',
+		'@wordpress/i18n-hyphenated-range': 'error',
+		'@wordpress/i18n-no-flanking-whitespace': 'error',
 		'@wordpress/i18n-text-domain': [
 			'error',
 			{
@@ -214,6 +222,21 @@ module.exports = {
 			},
 		],
 		'no-restricted-syntax': [ 'error', ...restrictedSyntax ],
+		'jsdoc/check-tag-names': [
+			'error',
+			{
+				definedTags: [ 'jest-environment' ],
+			},
+		],
+		'react-compiler/react-compiler': [
+			'error',
+			{
+				environment: {
+					enableTreatRefLikeIdentifiersAsRefs: true,
+					validateRefAccessDuringRender: false,
+				},
+			},
+		],
 	},
 	overrides: [
 		{
@@ -228,6 +251,7 @@ module.exports = {
 				'import/no-unresolved': 'off',
 				'import/named': 'off',
 				'@wordpress/data-no-store-string-literals': 'off',
+				'react-compiler/react-compiler': 'off',
 			},
 		},
 		{
@@ -280,7 +304,7 @@ module.exports = {
 		{
 			files: [ 'packages/*/src/**/*.[tj]s?(x)' ],
 			excludedFiles: [
-				'packages/components/src/**/@(test|stories)/**',
+				'packages/*/src/**/@(test|stories)/**',
 				'**/*.@(native|ios|android).js',
 			],
 			rules: {
@@ -313,39 +337,39 @@ module.exports = {
 					...[
 						'BorderBoxControl',
 						'BorderControl',
+						'BoxControl',
+						'Button',
+						'ComboboxControl',
+						'CustomSelectControl',
 						'DimensionControl',
+						'FontAppearanceControl',
+						'FontFamilyControl',
 						'FontSizePicker',
+						'FormTokenField',
+						'InputControl',
+						'LetterSpacingControl',
+						'LineHeightControl',
+						'NumberControl',
+						'RangeControl',
+						'SelectControl',
+						'TextControl',
 						'ToggleGroupControl',
+						'UnitControl',
 					].map( ( componentName ) => ( {
 						// Falsy `__next40pxDefaultSize` without a non-default `size` prop.
 						selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="size"][value.value!="default"]))`,
 						message:
 							componentName +
-							' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+							' should have the `__next40pxDefaultSize` prop when using the default size.',
 					} ) ),
-					// Temporary rules until all existing components have the `__next40pxDefaultSize` prop.
-					...[ 'SelectControl', 'TextControl' ].map(
-						( componentName ) => ( {
-							// Not strict. Allows pre-existing __next40pxDefaultSize={ false } usage until they are all manually updated.
-							selector: `JSXOpeningElement[name.name="${ componentName }"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"])):not(:has(JSXAttribute[name.name="size"]))`,
-							message:
-								componentName +
-								' should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
-						} )
-					),
+					{
+						// Falsy `__next40pxDefaultSize` without a `render` prop.
+						selector:
+							'JSXOpeningElement[name.name="FormFileUpload"]:not(:has(JSXAttribute[name.name="__next40pxDefaultSize"][value.expression.value!=false])):not(:has(JSXAttribute[name.name="render"]))',
+						message:
+							'FormFileUpload should have the `__next40pxDefaultSize` prop to opt-in to the new default size.',
+					},
 				],
-			},
-		},
-		{
-			files: [
-				// Components package.
-				'packages/components/src/**/*.[tj]s?(x)',
-				// Navigation block.
-				'packages/block-library/src/navigation/**/*.[tj]s?(x)',
-			],
-			excludedFiles: [ ...developmentFiles ],
-			rules: {
-				'react-hooks/exhaustive-deps': 'error',
 			},
 		},
 		{
@@ -543,6 +567,7 @@ module.exports = {
 		{
 			files: [ 'packages/interactivity*/src/**' ],
 			rules: {
+				'react-compiler/react-compiler': 'off',
 				'react/react-in-jsx-scope': 'error',
 			},
 		},
