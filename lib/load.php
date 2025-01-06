@@ -87,6 +87,7 @@ require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-processor
 
 // WordPress 6.7 compat.
 require __DIR__ . '/compat/wordpress-6.7/block-templates.php';
+require __DIR__ . '/compat/wordpress-6.7/admin-bar.php';
 require __DIR__ . '/compat/wordpress-6.7/blocks.php';
 require __DIR__ . '/compat/wordpress-6.7/block-bindings.php';
 require __DIR__ . '/compat/wordpress-6.7/script-modules.php';
