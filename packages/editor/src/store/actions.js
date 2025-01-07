@@ -204,6 +204,7 @@ export const savePost =
 		}
 
 		const content = select.getEditedPostContent();
+		const title = select.getEditedPostAttribute( 'title' );
 
 		if ( ! options.isAutosave ) {
 			dispatch.editPost( { content }, { undoIgnore: true } );
@@ -212,6 +213,7 @@ export const savePost =
 		const previousRecord = select.getCurrentPost();
 		let edits = {
 			id: previousRecord.id,
+			title,
 			...registry
 				.select( coreStore )
 				.getEntityRecordNonTransientEdits(
