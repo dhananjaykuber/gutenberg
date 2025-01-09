@@ -63,6 +63,7 @@ export default function PostFeaturedImageEdit( {
 	const isDescendentOfQueryLoop = Number.isFinite( queryId );
 	const {
 		isLink,
+		useEmptyAlt,
 		aspectRatio,
 		height,
 		width,
@@ -292,6 +293,32 @@ export default function PostFeaturedImageEdit( {
 								value={ rel }
 								onChange={ ( newRel ) =>
 									setAttributes( { rel: newRel } )
+								}
+							/>
+						</ToolsPanelItem>
+					) }
+					{ ! isLink && (
+						<ToolsPanelItem
+							label={ __( 'Alt Text Settings' ) }
+							isShownByDefault
+							hasValue={ () => useEmptyAlt }
+							onDeselect={ () =>
+								setAttributes( {
+									useEmptyAlt: false,
+								} )
+							}
+						>
+							<ToggleControl
+								__nextHasNoMarginBottom
+								label={ __(
+									'Use empty alt text (decorative image)'
+								) }
+								help={ __(
+									'Enable this if the image is purely decorative and should be ignored by screen readers.'
+								) }
+								checked={ useEmptyAlt }
+								onChange={ ( value ) =>
+									setAttributes( { useEmptyAlt: value } )
 								}
 							/>
 						</ToolsPanelItem>
