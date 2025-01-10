@@ -177,12 +177,6 @@ export default function PostTemplateEdit( {
 				query.format = format;
 			}
 
-			// If sticky is not set, it will return all posts in the results.
-			// If sticky is set to `only`, it will limit the results to sticky posts only.
-			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
-			if ( sticky ) {
-				query.sticky = sticky === 'only';
-			}
 			// If `inherit` is truthy, adjust conditionally the query to create a better preview.
 			if ( inherit ) {
 				// Change the post-type if needed.
@@ -203,14 +197,54 @@ export default function PostTemplateEdit( {
 					);
 				}
 			}
+
 			// When we preview Query Loop blocks we should prefer the current
 			// block's postType, which is passed through block context.
 			const usedPostType = previewPostType || postType;
+
+			// If sticky is not set, it will return all posts in the results.
+			// If sticky is set to `only`, it will limit the results to sticky posts only.
+			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
+			if ( sticky === 'only' ) {
+				return {
+					posts: getEntityRecords( 'postType', usedPostType, {
+						...query,
+						...restQueryArgs,
+						sticky: true,
+					} ),
+					blocks: getBlocks( clientId ),
+				};
+			} else if ( sticky === 'exclude' ) {
+				return {
+					posts: getEntityRecords( 'postType', usedPostType, {
+						...query,
+						...restQueryArgs,
+						sticky: false,
+					} ),
+					blocks: getBlocks( clientId ),
+				};
+			}
+
+			const stickyPosts = getEntityRecords( 'postType', usedPostType, {
+				...query,
+				sticky: true,
+				per_page: -1,
+			} );
+
+			const regularPosts = getEntityRecords( 'postType', usedPostType, {
+				...query,
+				...restQueryArgs,
+				sticky: false,
+				per_page: perPage
+					? Math.max( 0, perPage - ( stickyPosts?.length || 0 ) )
+					: undefined,
+			} );
+
 			return {
-				posts: getEntityRecords( 'postType', usedPostType, {
-					...query,
-					...restQueryArgs,
-				} ),
+				posts:
+					stickyPosts && regularPosts
+						? [ ...stickyPosts, ...regularPosts ]
+						: null,
 				blocks: getBlocks( clientId ),
 			};
 		},
