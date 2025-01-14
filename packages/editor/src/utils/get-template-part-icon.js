@@ -6,7 +6,6 @@ import {
 	footer as footerIcon,
 	sidebar as sidebarIcon,
 	symbolFilled as symbolFilledIcon,
-	layout as layoutIcon,
 } from '@wordpress/icons';
 /**
  * Helper function to retrieve the corresponding icon by name.
@@ -22,8 +21,6 @@ export function getTemplatePartIcon( iconName ) {
 		return footerIcon;
 	} else if ( 'sidebar' === iconName ) {
 		return sidebarIcon;
-	} else if ( 'layout' === iconName ) {
-		return layoutIcon;
 	}
 	return symbolFilledIcon;
 }
