@@ -130,12 +130,17 @@ export default function PostPreviewButton( {
 				editor.getCurrentPostType( 'type' )
 			);
 
+			const canView = postType?.viewable ?? false;
+			const previewUrl = canView
+				? editor.getEditedPostPreviewLink()
+				: null;
+
 			return {
 				postId: editor.getCurrentPostId(),
 				currentPostLink: editor.getCurrentPostAttribute( 'link' ),
-				previewLink: editor.getEditedPostPreviewLink(),
+				previewLink: previewUrl,
 				isSaveable: editor.isEditedPostSaveable(),
-				isViewable: postType?.viewable ?? false,
+				isViewable: canView,
 			};
 		}, [] );
 
