@@ -15,7 +15,7 @@
  *
  * @param WP_Admin_Bar $wp_admin_bar The WP_Admin_Bar instance.
  */
-function wp_admin_bar_edit_site_menu( $wp_admin_bar ) {
+function gutenberg_wp_admin_bar_edit_site_menu( $wp_admin_bar ) {
 	// Don't show if a block theme is not activated.
 	if ( ! wp_is_block_theme() ) {
 		return;
@@ -35,4 +35,4 @@ function wp_admin_bar_edit_site_menu( $wp_admin_bar ) {
 	);
 }
 
-add_action( 'admin_bar_menu', 'wp_admin_bar_edit_site_menu', 40 );
+add_action( 'admin_bar_menu', 'gutenberg_wp_admin_bar_edit_site_menu', 41 );
