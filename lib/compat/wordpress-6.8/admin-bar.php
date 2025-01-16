@@ -2,7 +2,7 @@
 /**
  * Changes to the WordPress admin bar.
  *
- * @package gutenberg
+ * @package WordPress
  */
 
 /**
@@ -11,11 +11,11 @@
  * @since 5.9.0
  * @since 6.3.0 Added `$_wp_current_template_id` global for editing of current template directly from the admin bar.
  * @since 6.6.0 Added the canvas argument to the url.
- * @since 6.7.0 Changed to open Site Editor at top level instead of specific template.
+ * @since 6.8.0 Changed to open Site Editor at top level instead of specific template.
  *
  * @param WP_Admin_Bar $wp_admin_bar The WP_Admin_Bar instance.
  */
-function gutenberg_admin_bar_edit_site_menu( $wp_admin_bar ) {
+function wp_admin_bar_edit_site_menu( $wp_admin_bar ) {
 	// Don't show if a block theme is not activated.
 	if ( ! wp_is_block_theme() ) {
 		return;
@@ -34,5 +34,5 @@ function gutenberg_admin_bar_edit_site_menu( $wp_admin_bar ) {
 		)
 	);
 }
-remove_action( 'admin_bar_menu', 'wp_admin_bar_edit_site_menu', 40 );
-add_action( 'admin_bar_menu', 'gutenberg_admin_bar_edit_site_menu', 41 );
+
+add_action( 'admin_bar_menu', 'wp_admin_bar_edit_site_menu', 40 );

@@ -87,7 +87,6 @@ require __DIR__ . '/compat/wordpress-6.7/html-api/class-gutenberg-html-processor
 
 // WordPress 6.7 compat.
 require __DIR__ . '/compat/wordpress-6.7/block-templates.php';
-require __DIR__ . '/compat/wordpress-6.7/admin-bar.php';
 require __DIR__ . '/compat/wordpress-6.7/blocks.php';
 require __DIR__ . '/compat/wordpress-6.7/block-bindings.php';
 require __DIR__ . '/compat/wordpress-6.7/script-modules.php';
@@ -102,6 +101,7 @@ require __DIR__ . '/compat/wordpress-6.8/functions.php';
 require __DIR__ . '/compat/wordpress-6.8/post.php';
 require __DIR__ . '/compat/wordpress-6.8/site-editor.php';
 require __DIR__ . '/compat/wordpress-6.8/class-gutenberg-rest-user-controller.php';
+require __DIR__ . '/compat/wordpress-6.8/admin-bar.php';
 
 // Experimental features.
 require __DIR__ . '/experimental/block-editor-settings-mobile.php';
