@@ -209,7 +209,7 @@ export const saveDirtyEntities =
 				} else {
 					registry
 						.dispatch( noticesStore )
-						.createSuccessNotice( __( 'Site updated.' ), {
+						.createSuccessNotice( __( 'Theme updated.' ), {
 							type: 'snackbar',
 							id: saveNoticeId,
 							actions: [
