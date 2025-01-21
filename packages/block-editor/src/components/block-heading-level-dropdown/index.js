@@ -3,6 +3,8 @@
  */
 import { ToolbarDropdownMenu } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
+import { store as preferencesStore } from '@wordpress/preferences';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -39,13 +41,18 @@ export default function HeadingLevelDropdown( {
 	options = HEADING_LEVELS,
 	value,
 	onChange,
-	showIconLabels = false,
 } ) {
 	const validOptions = options
 		.filter(
 			( option ) => option === 0 || HEADING_LEVELS.includes( option )
 		)
 		.sort( ( a, b ) => a - b ); // Sorts numerically in ascending order;
+
+	const showIconLabels = useSelect(
+		( select ) =>
+			select( preferencesStore ).get( 'core', 'showIconLabels' ),
+		[]
+	);
 
 	return (
 		<ToolbarDropdownMenu
