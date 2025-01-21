@@ -39,6 +39,7 @@ export default function HeadingLevelDropdown( {
 	options = HEADING_LEVELS,
 	value,
 	onChange,
+	showIconLabels = false,
 } ) {
 	const validOptions = options
 		.filter(
@@ -53,16 +54,18 @@ export default function HeadingLevelDropdown( {
 			label={ __( 'Change level' ) }
 			controls={ validOptions.map( ( targetLevel ) => {
 				const isActive = targetLevel === value;
+				const title =
+					targetLevel === 0
+						? __( 'Paragraph' )
+						: sprintf(
+								// translators: %d: heading level e.g: "1", "2", "3"
+								__( 'Heading %d' ),
+								targetLevel
+						  );
+
 				return {
 					icon: <HeadingLevelIcon level={ targetLevel } />,
-					title:
-						targetLevel === 0
-							? __( 'Paragraph' )
-							: sprintf(
-									// translators: %d: heading level e.g: "1", "2", "3"
-									__( 'Heading %d' ),
-									targetLevel
-							  ),
+					title: showIconLabels ? title : undefined,
 					isActive,
 					onClick() {
 						onChange( targetLevel );
