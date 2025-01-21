@@ -202,6 +202,20 @@ export default function PostTemplateEdit( {
 			// block's postType, which is passed through block context.
 			const usedPostType = previewPostType || postType;
 
+			// Only handle sticky posts for 'post' post type.
+			const shouldHandleSticky = usedPostType === 'post';
+
+			// If sticky is not applicable for this post type, or sticky is not set
+			if ( ! shouldHandleSticky ) {
+				return {
+					posts: getEntityRecords( 'postType', usedPostType, {
+						...query,
+						...restQueryArgs,
+					} ),
+					blocks: getBlocks( clientId ),
+				};
+			}
+
 			// If sticky is not set, it will return all posts in the results.
 			// If sticky is set to `only`, it will limit the results to sticky posts only.
 			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
